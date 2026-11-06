@@ -1,0 +1,8 @@
+const quoteEl=document.getElementById("quote"),characterEl=document.getElementById("character"),animeEl=document.getElementById("anime"),randomBtn=document.getElementById("randomBtn"),btnText=document.getElementById("btnText"),copyBtn=document.getElementById("copyBtn"),statusEl=document.getElementById("status");
+let currentQuote="";document.getElementById("year").textContent=new Date().getFullYear();
+async function getQuote(){randomBtn.disabled=true;copyBtn.disabled=true;btnText.textContent="Memuat...";statusEl.textContent="Sedang mencari kutipan anime...";
+try{const response=await fetch("/api/animequotes",{headers:{Accept:"application/json"}});const data=await response.json();if(!response.ok||data.status!==true||!data.result)throw new Error(data.message||"Server memberi respons yang tidak sesuai.");
+currentQuote=data.result.quote||"";quoteEl.textContent=currentQuote||"Kutipan tidak tersedia.";characterEl.textContent=data.result.character||"Unknown character";animeEl.textContent=data.result.anime||"Unknown anime";copyBtn.disabled=!currentQuote;statusEl.textContent="Kutipan baru berhasil dimuat ✦";
+}catch(error){statusEl.textContent=error.message||"Gagal memuat quotes. Coba lagi.";}finally{randomBtn.disabled=false;btnText.textContent="Acak Quotes";}}
+randomBtn.addEventListener("click",getQuote);
+copyBtn.addEventListener("click",async()=>{if(!currentQuote)return;try{await navigator.clipboard.writeText(`“${currentQuote}”\n— ${characterEl.textContent}, ${animeEl.textContent}`);statusEl.textContent="Kutipan berhasil disalin!";}catch{statusEl.textContent="Clipboard tidak tersedia di browser ini.";}});
